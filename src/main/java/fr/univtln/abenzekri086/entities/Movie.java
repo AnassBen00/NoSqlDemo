@@ -1,14 +1,12 @@
-package fr.univtln.abenzekri086.redis;
+package fr.univtln.abenzekri086.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @Getter
 @Setter
 public class Movie implements Serializable {
