@@ -34,6 +34,11 @@ docker network create memcached-cluster
 #Lancez un conteneur Memcached sur chacun des serveurs.
 docker run -d --name memcached --net memcached-cluster memcached memcached -p 11211
 
+# Utiliser des conteneurs comme des noeuds
+#docker run -d --name memcached-node1 --net memcached-cluster memcached memcached -p 11211
+#docker run -d --name memcached-node2 --net memcached-cluster memcached memcached -p 11211
+#docker run -d --name memcached-node3 --net memcached-cluster memcached memcached -p 11211
+
 # Lancez un conteneur HAProxy sur l'un des serveurs
 docker run -d --name haproxy --net memcached-cluster -p 11211:11211 haproxy
 
@@ -41,6 +46,7 @@ docker run -d --name haproxy --net memcached-cluster -p 11211:11211 haproxy
 docker exec -it haproxy bash
 
 #Cela ouve un shell à l'intérieur du conteneur, éditer le fichier en utilisant vi ou nano.
+nano haproxy.cfg
 
 frontend memcached
     bind *:11211

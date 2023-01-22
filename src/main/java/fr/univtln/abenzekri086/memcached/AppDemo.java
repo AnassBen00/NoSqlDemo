@@ -59,6 +59,9 @@ public class AppDemo {
         memcachedClient.shutdown();
     }
 
+    /**
+     * cette methode permet d'ajouter un ensemble de donnees recupere depuis un fichier json
+     */
     public static void add() throws IOException {
         // Pour répartir la charge entre plusieurs serveurs
         /*
@@ -70,10 +73,10 @@ public class AppDemo {
         MemcachedClient client = new MemcachedClient(addresses);
         */
 
-        // Create the MemcachedClient
+        // cree le MemcachedClient
         MemcachedClient client = new MemcachedClient(new InetSocketAddress("localhost", 11211));
 
-        // clear all data
+        // vider les donnees
         client.flush();
 
         List<Movie> movies = new ArrayList<>();
@@ -91,31 +94,33 @@ public class AppDemo {
 
         // Parcourir la liste d'objets et stocker chaque objet dans memcached
         for (Movie movie : movies) {
-            // Store each value in the cache
             // définir un délai d'expiration en secondes lors de l'enregistrement d'une valeur en cache 3600
             client.set(movie.getId(), 3600, movie);
         }
 
-        // Close the client when you are done
+        // fermeture de client
         client.shutdown();
     }
 
+    /**
+     * cette methode permet de recuperer une donnee en passant la cle qui correspond comme parametre
+     */
     public static void getObject(String key) throws IOException, ExecutionException, InterruptedException {
-        // Create the MemcachedClient
+        // Cree le MemcachedClient
         MemcachedClient client = new MemcachedClient(new InetSocketAddress("localhost", 11211));
 
-        // Create the ObjectMapper
+        // Creation de ObjectMapper
         ObjectMapper objectMapper = new ObjectMapper();
         JsonFactory factory = new JsonFactory();
 
-        // Check the cache for the data
+        // verifier la donnee dans le cache
         Future<Object> future = client.asyncGet(key);
         if (future != null) {
-            // The data was found in the cache, so we can use it
+            // donnee trouver dans le cache on peut l'utiliser
             System.out.println(future.get().toString());
 
         } else {
-            // The data was not found in the cache, so we need to retrieve it from the dataset
+            // la donnee n'a pas ete trouver donc on la recupere de la dataset
             try (JsonParser parser = factory.createParser(new File("src/main/resources/movies.json"))) {
                 parser.setCodec(objectMapper);
                 while (parser.nextToken() != null) {
@@ -128,14 +133,16 @@ public class AppDemo {
             }
         }
 
-        // Close the client when you are done
+        // Fermer le client
         client.shutdown();
     }
 
+    /**
+     * cette methode permet de supprimer une donnee en passant la cle qui correspond comme parametre
+     */
     public static void delete(String key) throws IOException, ExecutionException, InterruptedException {
         // Create the MemcachedClient
         MemcachedClient client = new MemcachedClient(new InetSocketAddress("localhost", 11211));
-        System.out.println("4------->debug");
         // Delete the data from the cache
 
         Future<Boolean> future = client.delete(key);
@@ -155,6 +162,10 @@ public class AppDemo {
         client.shutdown();
     }
 
+
+    /**
+     * cette methode crée un objet de type Movie et l'assigne à la clé en utilisant la méthode "prepend", ce qui permet d'ajouter de
+     * nouvelles données avant les données existantes de la clé.c'est utile pour suivre l'historique des modifications apportées à une clé particulière.*/
 
     public static void prepend(String key) throws IOException, InterruptedException, ExecutionException {
         // Create the MemcachedClient
